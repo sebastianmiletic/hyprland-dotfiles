@@ -124,13 +124,13 @@ ContentPage {
             }
             ColumnLayout {
                 Layout.fillWidth: true; spacing: 2
-                StyledText { text: GoogleTasks.connected ? Translation.tr("Connected") : Translation.tr("Connect your Google account"); color: Appearance.colors.colOnLayer1; font.pixelSize: Appearance.font.pixelSize.large; font.weight: Font.DemiBold }
+                StyledText { text: GoogleTasks.connected ? Translation.tr("Connected") : Translation.tr("Connect Google Tasks"); color: Appearance.colors.colOnLayer1; font.pixelSize: Appearance.font.pixelSize.large; font.weight: Font.DemiBold }
                 StyledText { Layout.fillWidth: true; text: GoogleTasks.statusText; color: Appearance.colors.colSubtext; elide: Text.ElideRight }
             }
             DialogButton {
                 visible: !GoogleTasks.connected
-                buttonText: Translation.tr("Add Google account")
-                onClicked: Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", "online-accounts"])
+                buttonText: GoogleTasks.credentialsReady ? Translation.tr("Connect") : Translation.tr("Setup guide")
+                onClicked: GoogleTasks.connectAccount()
             }
             DialogButton {
                 visible: GoogleTasks.connected
@@ -142,7 +142,7 @@ ContentPage {
 
         StyledText {
             Layout.fillWidth: true
-            text: Translation.tr("Add your Google account through GNOME Online Accounts, enable Tasks access, then press Recheck account. Your real Google tasks are shown and edited directly in the right sidebar; no Cloud project or OAuth client file is needed.")
+            text: Translation.tr("Your Google account is present, but GNOME Online Accounts does not grant the Tasks permission. Enable the Google Tasks API, create a Desktop OAuth client, download its JSON, and import it here. The sidebar then syncs additions, completions, and deletions directly with Google Tasks.")
             color: Appearance.colors.colSubtext
             wrapMode: Text.WordWrap
         }
@@ -150,15 +150,20 @@ ContentPage {
         RowLayout {
             Layout.fillWidth: true
             DialogButton {
-                buttonText: Translation.tr("Recheck account")
+                buttonText: Translation.tr("Import OAuth JSON")
+                enabled: !GoogleTasks.busy
+                onClicked: GoogleTasks.importCredentials()
+            }
+            DialogButton {
+                buttonText: Translation.tr("Recheck")
                 enabled: !GoogleTasks.busy
                 onClicked: GoogleTasks.checkStatus()
             }
             Item { Layout.fillWidth: true }
             DialogButton {
-                visible: GoogleTasks.connected
-                buttonText: Translation.tr("Manage account")
-                onClicked: Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", "online-accounts"])
+                visible: !GoogleTasks.connected
+                buttonText: Translation.tr("Open setup guide")
+                onClicked: Quickshell.execDetached(["xdg-open", "https://developers.google.com/workspace/tasks/quickstart/python#set_up_your_environment"])
             }
         }
 

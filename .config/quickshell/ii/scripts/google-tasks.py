@@ -8,6 +8,7 @@ import http.server
 import json
 import os
 import secrets
+import shutil
 import socket
 import subprocess
 import sys
@@ -45,8 +46,6 @@ def goa_google_account(with_token=False):
                 continue
             provider = account.get_cached_property("ProviderType")
             if provider is None or provider.unpack() != "google":
-                continue
-            if obj.get_interface("org.gnome.OnlineAccounts.Tasks") is None:
                 continue
             identity_value = account.get_cached_property("PresentationIdentity")
             identity = identity_value.unpack() if identity_value is not None else "Google account"
@@ -116,12 +115,12 @@ def refresh_token(token, creds):
 
 
 def get_token():
+    if TOKEN_PATH.exists() and CREDS_PATH.exists():
+        return refresh_token(json.loads(TOKEN_PATH.read_text(encoding="utf-8")), credentials())
     goa_account = goa_google_account(with_token=True)
     if goa_account:
         return goa_account
-    if not TOKEN_PATH.exists():
-        raise RuntimeError("Add a Google account in GNOME Online Accounts")
-    return refresh_token(json.loads(TOKEN_PATH.read_text(encoding="utf-8")), credentials())
+    raise RuntimeError("Import a Google Desktop OAuth JSON, then connect")
 
 
 def api(method, path, token, body=None, query=None):
@@ -189,6 +188,40 @@ def authorize():
     emit("connected")
 
 
+def install_credentials(source):
+    source_path = Path(source).expanduser().resolve()
+    raw = json.loads(source_path.read_text(encoding="utf-8"))
+    data = raw.get("installed")
+    if not data or not data.get("client_id"):
+        raise RuntimeError("Choose the JSON for a Desktop app OAuth client")
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    if source_path != CREDS_PATH.resolve():
+        shutil.copyfile(source_path, CREDS_PATH)
+    os.chmod(CREDS_PATH, 0o600)
+    TOKEN_PATH.unlink(missing_ok=True)
+    emit("credentials_imported")
+
+
+def tasks_permission_status():
+    """Return whether any locally available token can call Google Tasks."""
+    if TOKEN_PATH.exists() and CREDS_PATH.exists():
+        try:
+            token = refresh_token(json.loads(TOKEN_PATH.read_text(encoding="utf-8")), credentials())
+            api("GET", "/users/@me/lists", token, query={"maxResults": 1})
+            return True
+        except Exception:
+            pass
+    account = goa_google_account()
+    if account:
+        try:
+            token = goa_google_account(with_token=True)
+            api("GET", "/users/@me/lists", token, query={"maxResults": 1})
+            return True
+        except Exception:
+            return False
+    return False
+
+
 def task_list_id(token):
     lists = api("GET", "/users/@me/lists", token).get("items", [])
     if not lists:
@@ -242,32 +275,44 @@ def sync():
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("status", "auth", "sync", "disconnect"))
+    parser.add_argument("command", choices=("status", "auth", "sync", "disconnect", "install-credentials"))
+    parser.add_argument("path", nargs="?")
     args = parser.parse_args()
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     if args.command == "status":
         goa_account = goa_google_account()
-        if goa_account:
-            emit("connected", credentials=True, source="goa", identity=goa_account["identity"])
+        if tasks_permission_status():
+            emit("connected", credentials=True,
+                 source="goa" if goa_account else "legacy",
+                 identity=goa_account["identity"] if goa_account else "Google Tasks")
+        elif goa_account:
+            emit("permission_required", credentials=CREDS_PATH.exists(),
+                 identity=goa_account["identity"],
+                 message="Google account found; import a Tasks OAuth JSON")
+        elif CREDS_PATH.exists():
+            emit("permission_required", credentials=True,
+                 message="Connect again to grant Google Tasks access")
         else:
-            emit("connected" if TOKEN_PATH.exists() else "disconnected",
-                 credentials=CREDS_PATH.exists(), source="legacy")
+            emit("disconnected", credentials=False, source="legacy")
     elif args.command == "auth":
         goa_account = goa_google_account()
-        if goa_account:
-            emit("connected", source="goa", identity=goa_account["identity"])
-        elif CREDS_PATH.exists():
+        if CREDS_PATH.exists():
             authorize()
+        elif goa_account and tasks_permission_status():
+            emit("connected", source="goa", identity=goa_account["identity"])
         else:
-            subprocess.Popen(["env", "XDG_CURRENT_DESKTOP=GNOME",
-                              "gnome-control-center", "online-accounts"],
+            subprocess.Popen(["xdg-open", "https://developers.google.com/workspace/tasks/quickstart/python#set_up_your_environment"],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            emit("settings_opened", credentials=True)
+            emit("setup_opened", credentials=False)
     elif args.command == "sync":
         sync()
-    else:
+    elif args.command == "disconnect":
         TOKEN_PATH.unlink(missing_ok=True)
         emit("disconnected")
+    else:
+        if not args.path:
+            raise RuntimeError("No OAuth JSON selected")
+        install_credentials(args.path)
 
 
 if __name__ == "__main__":
