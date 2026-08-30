@@ -7,8 +7,9 @@ Personal Arch Linux desktop configuration built around Hyprland and
 
 - Hyprland Lua configuration and custom keybindings
 - Quickshell bars, sidebars, launcher, widgets, and settings
-- Integrated Google Tasks sidebar through GNOME Online Accounts
+- Native Google Tasks sidebar using a local Desktop OAuth authorization
 - `Super+Z` Gemini answer for highlighted text, with screen-question fallback
+- Delayed lid handling: suspend only after the lid stays closed for 15 seconds
 - Kitty, Foot, Zsh, Fastfetch, Fuzzel, Rofi, Dunst, and related UI configs
 
 ## Install
@@ -24,12 +25,16 @@ rsync -av --dry-run .config/quickshell/ ~/.config/quickshell/
 Remove `--dry-run` only after checking the proposed changes.
 
 The main shell requires Hyprland, Quickshell, and the programs referenced by
-the configuration. The embedded task integration additionally uses
-`gnome-online-accounts`, `gnome-control-center`, and the Google Tasks API.
+the configuration. The embedded task integration additionally uses the Google
+Tasks API. Enable the delayed lid behavior after copying the files:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now lid-suspend-delay.service
+```
 
 ## Private data
 
 Credentials, API keys, OAuth tokens, browser data, histories, and generated
 runtime state are intentionally excluded. Configure accounts and secrets
 locally after installation.
-

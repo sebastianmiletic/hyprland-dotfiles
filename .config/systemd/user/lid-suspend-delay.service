@@ -1,0 +1,12 @@
+[Unit]
+Description=Suspend after the lid remains closed for 15 seconds
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/systemd-inhibit --what=handle-lid-switch --who=lid-suspend-delay --why=Delay-lid-suspend-for-15-seconds --mode=block %h/.config/hypr/scripts/lid-suspend-delay.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target
