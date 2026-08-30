@@ -259,7 +259,8 @@ def main():
         elif CREDS_PATH.exists():
             authorize()
         else:
-            subprocess.Popen(["gnome-control-center", "online-accounts"],
+            subprocess.Popen(["env", "XDG_CURRENT_DESKTOP=GNOME",
+                              "gnome-control-center", "online-accounts"],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             emit("settings_opened", credentials=True)
     elif args.command == "sync":

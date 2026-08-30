@@ -36,7 +36,7 @@ Rectangle {
             RippleButton {
                 implicitWidth: 34; implicitHeight: 34; buttonRadius: 17
                 enabled: !GoogleTasks.busy
-                onClicked: GoogleTasks.connected ? GoogleTasks.sync() : Quickshell.execDetached(["gnome-control-center", "online-accounts"])
+                onClicked: GoogleTasks.connected ? GoogleTasks.sync() : Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", "online-accounts"])
                 contentItem: MaterialSymbol {
                     anchors.centerIn: parent
                     text: GoogleTasks.connected ? "sync" : "account_circle"

@@ -130,7 +130,7 @@ ContentPage {
             DialogButton {
                 visible: !GoogleTasks.connected
                 buttonText: Translation.tr("Add Google account")
-                onClicked: Quickshell.execDetached(["gnome-control-center", "online-accounts"])
+                onClicked: Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", "online-accounts"])
             }
             DialogButton {
                 visible: GoogleTasks.connected
@@ -158,7 +158,7 @@ ContentPage {
             DialogButton {
                 visible: GoogleTasks.connected
                 buttonText: Translation.tr("Manage account")
-                onClicked: Quickshell.execDetached(["gnome-control-center", "online-accounts"])
+                onClicked: Quickshell.execDetached(["env", "XDG_CURRENT_DESKTOP=GNOME", "gnome-control-center", "online-accounts"])
             }
         }
 
