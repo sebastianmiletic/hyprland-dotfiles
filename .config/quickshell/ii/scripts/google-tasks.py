@@ -46,6 +46,8 @@ def goa_google_account(with_token=False):
             provider = account.get_cached_property("ProviderType")
             if provider is None or provider.unpack() != "google":
                 continue
+            if obj.get_interface("org.gnome.OnlineAccounts.Tasks") is None:
+                continue
             identity_value = account.get_cached_property("PresentationIdentity")
             identity = identity_value.unpack() if identity_value is not None else "Google account"
             if not with_token:
