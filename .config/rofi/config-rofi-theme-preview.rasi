@@ -1,0 +1,64 @@
+@import "~/.config/rofi/config.rasi"
+
+configuration {
+    show-icons: true;
+}
+
+window {
+    width: 800px;
+    height: 600px;
+    border: 2px;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+mainbox {
+    children: [ "inputbar", "message", "listview" ];
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    spacing: 10px;
+    margin: 0 0 10px 0;
+}
+
+entry {
+    placeholder: "Search theme...";
+}
+
+message {
+    padding: 10px;
+    border-radius: 10px;
+}
+
+listview {
+    columns: 2;
+    lines: 4;
+    spacing: 12px;
+    fixed-height: false;
+    scrollbar: false;
+    cycle: true;
+}
+
+element {
+    orientation: vertical;
+    padding: 10px;
+    border-radius: 14px;
+    spacing: 8px;
+    children: [ element-icon, element-text ];
+}
+
+element-icon {
+    size: 220px;
+    border-radius: 10px;
+}
+
+element-text {
+    font: "Inter 14";
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+}
+
+element selected {
+    border: 2px;
+}

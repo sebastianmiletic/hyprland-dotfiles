@@ -1,0 +1,110 @@
+/* Clean wallpaper grid selector */
+@import "~/.config/rofi/0-shared-fonts.rasi"
+
+configuration {
+    modi: "drun";
+    show-icons: true;
+    disable-history: true;
+    no-custom: true;
+    fixed-num-lines: false;
+}
+
+window {
+    width: 85%;
+    height: 75%;
+    border: 2px;
+    border-color: #313145;
+    border-radius: 18px;
+    background-color: #0f0f12;
+    padding: 20px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    orientation: vertical;
+    children: [ "inputbar", "listview" ];
+    spacing: 16px;
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    spacing: 10px;
+    margin: 0 0 10px 0;
+}
+
+prompt {
+    font: "Inter 16";
+    text-color: #cba6f7;
+    padding: 8px 12px;
+}
+
+entry {
+    font: "Inter 16";
+    text-color: #e8e0f5;
+    placeholder: "Search / Choose Wallpaper";
+    placeholder-color: #6e6e80;
+    expand: true;
+    horizontal-align: 0.5;
+    padding: 8px 12px;
+}
+
+listview {
+    columns: 5;
+    lines: 3;
+    spacing: 16px;
+    padding: 10px;
+    flow: horizontal;
+    fixed-width: true;
+    fixed-height: true;
+    cycle: true;
+    background-color: transparent;
+}
+
+element {
+    orientation: vertical;
+    border-radius: 12px;
+    padding: 6px;
+    margin: 4px;
+    background-color: #1a1a20;
+    border: 2px;
+    border-color: transparent;
+}
+
+element-icon {
+    size: 22%;
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+element-text {
+    font: "Inter 13";
+    text-color: #b0b0c0;
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    padding: 6px 0 0 0;
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-color: #2a2a35;
+    border-color: #89b4fa;
+    text-color: #ffffff;
+}
+
+element selected.active {
+    background-color: #2a2a35;
+    border-color: #cba6f7;
+    text-color: #ffffff;
+}
+
+element selected.urgent {
+    background-color: #2a2a35;
+    border-color: #ff7a7a;
+    text-color: #ffffff;
+}
+
+scrollbar {
+    width: 0px;
+    background-color: transparent;
+}

@@ -1,0 +1,77 @@
+configuration {
+    show-icons: true;
+}
+
+* {
+    font: "Inter 16";
+    background: #0f0f12;
+    bg-alt: #1a1a20;
+    bg-selected: #2e2e3a;
+    foreground: #eeeeee;
+    accent: #89b4fa;
+    border: #313145;
+    spacing: 0;
+}
+
+window {
+    width: 700px;
+    height: 480px;
+    border: 2px;
+    border-color: @border;
+    border-radius: 18px;
+    background-color: @background;
+    padding: 24px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    orientation: vertical;
+    children: [listview];
+    spacing: 14px;
+    background-color: transparent;
+}
+
+listview {
+    columns: 1;
+    lines: 4;
+    spacing: 14px;
+    fixed-height: false;
+    dynamic: true;
+    background-color: transparent;
+}
+
+element {
+    orientation: horizontal;
+    padding: 12px;
+    border-radius: 14px;
+    background-color: @bg-alt;
+    spacing: 18px;
+    children: [element-icon, element-text];
+}
+
+element-icon {
+    size: 90px;
+    background-color: transparent;
+}
+
+element-text {
+    font: "Inter 18";
+    vertical-align: 0.5;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @bg-selected;
+    border: 2px;
+    border-color: @accent;
+}
+
+element selected.normal {
+    text-color: @accent;
+}
+
+scrollbar {
+    width: 0px;
+    background-color: transparent;
+}
