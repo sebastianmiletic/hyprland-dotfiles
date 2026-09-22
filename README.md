@@ -1,4 +1,4 @@
-# Sebastian's Hyprland dotfiles
+# My Hyprland dotfiles
 
 Personal Arch Linux desktop configuration built around Hyprland and
 [illogical-impulse Quickshell](https://github.com/end-4/dots-hyprland).
